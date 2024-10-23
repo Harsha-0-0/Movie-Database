@@ -1,0 +1,469 @@
+--
+--  Spring 2024 
+--
+--  Harsha varthini Maniraj 
+--  Harsha.V.Maniraj@student.uts.edu.au
+--  25379328
+--
+--  MOVIE DATABASE
+--
+--  This database stores information about various movies of different genres, languages, actors, etc,. 
+--  You can use this as a movie recommendation database or just search for movies based on the actor or genre.
+--
+--  It works like IMDb website where you can information about movies and get some recommendations(https://www.imdb.com/?ref_=nv_home)
+--
+
+
+DROP view IF EXISTS Thriller_Movies CASCADE;
+
+
+DROP table IF EXISTS Movie CASCADE;
+DROP table IF EXISTS StreamingPlatform CASCADE;
+DROP table IF EXISTS MovieStreamingPlatform CASCADE;
+DROP table IF EXISTS Country CASCADE;
+DROP table IF EXISTS MovieCountry CASCADE;
+DROP table IF EXISTS Review CASCADE;
+DROP table IF EXISTS Genre CASCADE;
+DROP table IF EXISTS MovieGenre CASCADE;
+DROP table IF EXISTS Director CASCADE;
+DROP table IF EXISTS MovieDirector CASCADE;
+DROP table IF EXISTS Language CASCADE;
+DROP table IF EXISTS MovieLanguage CASCADE;
+DROP table IF EXISTS Actor CASCADE;
+DROP table IF EXISTS MovieActor CASCADE;
+DROP table IF EXISTS Writer CASCADE;
+DROP table IF EXISTS MovieWriter CASCADE;
+
+
+Create table Movie
+(
+	movieID integer NOT NULL,
+	movieName text,
+	description text,
+	rating numeric,
+	releaseYear integer,
+	duration varchar(30),
+	
+	CONSTRAINT Movie_PK PRIMARY KEY (movieID),
+	CONSTRAINT rating_check CHECK (rating >= 0 AND rating <= 10)
+);
+
+
+Create table StreamingPlatform
+(
+	 platformID integer NOT NULL,
+	 platformName text,
+	
+	 CONSTRAINT StreamingPlatform_PK PRIMARY KEY (platformID)
+);
+
+ 
+Create table MovieStreamingPlatform
+(
+	platformID integer NOT NULL,
+	movieID integer,
+	
+	CONSTRAINT MovieStreamingPlatform_movieID_FK FOREIGN KEY (movieID) REFERENCES Movie ON DELETE CASCADE,
+	CONSTRAINT MovieStreamingPlatform_platformID_FK FOREIGN KEY (platformID) REFERENCES StreamingPlatform ON DELETE CASCADE,
+	CONSTRAINT MovieStreamingPlatform_PK PRIMARY KEY (platformID, movieID)
+);
+
+
+Create table Country
+(
+	 countryID integer NOT NULL,
+	 countryName text NOT NULL,
+	
+	 CONSTRAINT Country_PK PRIMARY KEY (countryID)
+);
+
+
+Create table MovieCountry
+(
+	countryID integer NOT NULL,
+	movieID integer NOT NULL,
+	
+	CONSTRAINT MovieCountry_movieID_FK FOREIGN KEY (movieID) REFERENCES Movie ON DELETE CASCADE,
+	CONSTRAINT MovieCountry_countryID_FK FOREIGN KEY (countryID) REFERENCES Country ON DELETE CASCADE,
+	CONSTRAINT MovieCountry_PK PRIMARY KEY (countryID, movieID)
+);
+
+
+Create table Review
+(
+	ReviewID integer NOT NULL,
+	description text NOT NULL,
+	movieID integer NOT NULL,
+	
+	CONSTRAINT Review_PK PRIMARY KEY (ReviewID),
+	CONSTRAINT Review_FK FOREIGN KEY (movieID) REFERENCES Movie ON DELETE CASCADE 
+);
+
+Create table Genre
+(
+	GenreID integer NOT NULL,
+	GenreName text NOT NULL,
+	
+	CONSTRAINT Genre_PK PRIMARY KEY (GenreID)
+);
+
+Create table MovieGenre
+(
+	GenreID integer NOT NULL,
+	MovieID integer NOT NULL,
+	
+	CONSTRAINT MovieGenre_MovieID_FK FOREIGN KEY (MovieID) REFERENCES Movie ON DELETE CASCADE,
+	CONSTRAINT MovieGenre_GenreID_FK FOREIGN KEY (GenreID) REFERENCES Genre ON DELETE CASCADE,
+	CONSTRAINT MovieGenre_PK PRIMARY KEY (GenreID, MovieID)
+);
+
+
+
+Create table Director
+(
+	DirectorID integer NOT NULL,
+	DirectorName text NOT NULL,
+	
+	CONSTRAINT Director_PK PRIMARY KEY (DirectorID)
+);
+
+
+
+
+Create table MovieDirector
+(
+	DirectorID integer NOT NULL,
+	MovieID integer NOT NULL,
+	
+	CONSTRAINT MovieDirector_MovieID_FK FOREIGN KEY (MovieID) REFERENCES Movie ON DELETE CASCADE,
+	CONSTRAINT MovieDirector_DirectorID_FK FOREIGN KEY (DirectorID) REFERENCES Director ON DELETE CASCADE,
+	CONSTRAINT MovieDirector_PK PRIMARY KEY (DirectorID, MovieID)
+);
+
+
+Create table Language
+(
+	LanguageID integer NOT NULL,
+	LanguageName text NOT NULL,
+	
+	CONSTRAINT Language_PK PRIMARY KEY (LanguageID)
+);
+
+
+Create table MovieLanguage
+(
+	LanguageID integer NOT NULL,
+	MovieID integer NOT NULL,
+	
+	CONSTRAINT MovieLanguage_MovieID_FK FOREIGN KEY (MovieID) REFERENCES Movie ON DELETE CASCADE,
+	CONSTRAINT MovieLanguage_LanguageID_FK FOREIGN KEY (LanguageID) REFERENCES Language ON DELETE CASCADE,
+	CONSTRAINT MovieLanguage_PK PRIMARY KEY (LanguageID, MovieID)
+);
+
+
+Create table Actor
+(
+	ActorID integer NOT NULL,
+	ActorName text NOT NULL,
+	
+	CONSTRAINT Actor_PK PRIMARY KEY (ActorID)
+);
+
+
+
+
+Create table MovieActor
+(
+	ActorID integer NOT NULL,
+	MovieID integer NOT NULL,
+	
+	CONSTRAINT MovieActor_MovieID_FK FOREIGN KEY (MovieID) REFERENCES Movie ON DELETE CASCADE,
+	CONSTRAINT MovieActor_ActorID_FK FOREIGN KEY (ActorID) REFERENCES Actor ON DELETE CASCADE,
+	CONSTRAINT MovieActor_PK PRIMARY KEY (ActorID, MovieID)
+);
+
+
+
+Create table Writer
+(
+	WriterID integer NOT NULL,
+	WriterName text NOT NULL,
+	
+	CONSTRAINT Writer_PK PRIMARY KEY (WriterID)
+);
+
+
+
+Create table MovieWriter
+(
+	WriterID integer NOT NULL,
+	MovieID integer NOT NULL,
+	
+	CONSTRAINT MovieWriter_MovieID_FK FOREIGN KEY (MovieID) REFERENCES Movie ON DELETE CASCADE,
+	CONSTRAINT MovieWriter_WriterID_FK FOREIGN KEY (WriterID) REFERENCES Writer ON DELETE CASCADE,
+	CONSTRAINT MovieWriter_PK PRIMARY KEY (WriterID, MovieID)
+);
+
+
+
+CREATE VIEW Thriller_Movies AS
+select m.moviename, m.description, m.rating, m.releaseYear from movie m natural join moviegenre i natural join genre g where m.movieid = i.movieid and g.genreid = i.genreid and 
+g.genrename = 'Thriller'; 
+
+
+
+
+Insert into Movie values(1,'Harry Potter and the Sorcerer’s Stone', 'An orphaned boy enrolls in a school of wizardry, where he learns the truth about himself, his family and the terrible evil that haunts the magical world.',7.6, 2001, '2 hours 32 minutes
+' );
+ 
+Insert into Movie values(2,'The Conjuring', 'Paranormal investigators Ed and Lorraine Warren work to help a family terrorized by a dark presence in their farmhouse.',7.5, 2013, '
+1 hour 52 minutes' );
+ 
+Insert into Movie values(3,'Twisters', 'Kate Carter, a retired tornado-chaser and meteorologist, is persuaded to return to Oklahoma to work with a new team and new technologies.',6.6, 2024, '
+2 hours 2 minutes' );
+
+Insert into Movie values(4,'Interstellar
+', 'When Earth becomes uninhabitable in the future, a farmer and ex-NASA pilot, Joseph Cooper, is tasked to pilot a spacecraft, along with a team of researchers, to find a new planet for humans.',8.7, 2014, '
+2 hours 49 minutes' );
+
+Insert into Movie values(5,'Little Women
+', '19th century Massachusetts. While the March sisters - Jo, Meg, Amy, and Beth - enter the threshold of womanhood, they go through many ups and downs in life and endeavor to make important decisions that can affect their future.',7.8, 2019, '
+2 hours 15 minutes' );
+
+
+
+
+
+Insert into streamingplatform values(1,'Netflix');
+ 
+Insert into streamingplatform values(2,'Amazon Prime Video');
+ 
+Insert into streamingplatform values(3,'Apple TV');
+
+
+
+
+
+
+Insert into moviestreamingplatform values(1, 1);
+ 
+Insert into moviestreamingplatform values(2, 1);
+ 
+Insert into moviestreamingplatform values(3, 1);
+ 
+Insert into moviestreamingplatform values(1, 2);
+ 
+Insert into moviestreamingplatform values(2, 2);
+ 
+Insert into moviestreamingplatform values(3, 2);
+
+Insert into moviestreamingplatform values(2, 3);
+
+Insert into moviestreamingplatform values(3, 3);
+
+Insert into moviestreamingplatform values(2, 4);
+
+Insert into moviestreamingplatform values(3, 4);
+
+Insert into moviestreamingplatform values(1, 5);
+
+Insert into moviestreamingplatform values(2, 5);
+
+Insert into moviestreamingplatform values(3, 5);
+
+
+
+
+Insert into country values(1, 'United Kingdom');
+ 
+Insert into country values(2, 'United States');
+
+Insert into country values(3, 'Canada');
+
+
+
+
+Insert into moviecountry values(1, 1);
+ 
+Insert into moviecountry values(2, 1);
+ 
+Insert into moviecountry values(2, 2);
+ 
+Insert into moviecountry values(2, 3);
+
+Insert into moviecountry values(1, 4);
+
+Insert into moviecountry values(2, 4);
+
+Insert into moviecountry values(3, 4);
+
+Insert into moviecountry values(2, 5);
+
+
+
+
+
+Insert into Review values(1, 'The major start of all the magic!',1);
+
+Insert into Review values(2,'The Magic Comes To Life!', 1);
+
+Insert into Review values(3, 'By far one of the best horror movies I`ve seen in a while.',2);
+
+Insert into Review values(4,'Scariest Movie of Haunted House and Exorcism that I Have Seen in Years', 2);
+
+Insert into Review values(5, 'Highly Entertaining Popcorn',3);
+
+Insert into Review values(6,'Hard to compete with the original', 3);
+
+Insert into Review values(7,'A Visually Monumental And Thoughtful Sci-Fi Epic', 4);
+
+Insert into Review values(8,'A journey across the galaxy to save humanity', 4);
+
+Insert into Review values(9,'Beautiful setting, great actors. A feel-good costume drama.', 5);
+
+Insert into Review values(10,'Touching and happy film filled with character and personality', 5);
+
+
+
+
+
+
+Insert into Genre values(1, 'Fantasy');
+Insert into Genre values(2, 'Adventure');
+Insert into Genre values(3, 'Horror');
+Insert into Genre values(4, 'Mystery');
+Insert into Genre values(5, 'Thriller');
+Insert into Genre values(6, 'Action');
+Insert into Genre values(7, 'Disaster');
+Insert into Genre values(8, 'Sci-Fi');
+Insert into Genre values(9, 'Space Sci-Fi');
+Insert into Genre values(10, 'Romance');
+Insert into Genre values(11, 'Period Drama');
+Insert into Genre values(12, 'Coming-of-Age');
+
+
+
+
+Insert into MovieGenre values(1, 1);
+Insert into MovieGenre values(2, 1);
+Insert into MovieGenre values(3, 2);
+Insert into MovieGenre values(4, 2);
+Insert into MovieGenre values(5, 2);
+Insert into MovieGenre values(2, 3);
+Insert into MovieGenre values(5, 3);
+Insert into MovieGenre values(6, 3);
+Insert into MovieGenre values(7, 3);
+Insert into MovieGenre values(2, 4);
+Insert into MovieGenre values(8, 4);
+Insert into MovieGenre values(9, 4);
+Insert into MovieGenre values(10, 5);
+Insert into MovieGenre values(11, 5);
+Insert into MovieGenre values(12, 5);
+
+
+
+
+Insert into Director values(1, 'Chris Columbus');
+Insert into Director values(2, 'James Wan');
+Insert into Director values(3, 'Lee Isaac Chung');
+Insert into Director values(4, 'Christopher Nolan');
+Insert into Director values(5, 'Greta Gerwig');
+
+
+
+
+
+Insert into MovieDirector values(1, 1);
+Insert into MovieDirector values(2, 2);
+Insert into MovieDirector values(3, 3);
+Insert into MovieDirector values(4, 4);
+Insert into MovieDirector values(5, 5);
+
+
+
+
+Insert into Language values(1, 'English');
+Insert into Language values(2, 'Latin');
+Insert into Language values(3, 'French');
+
+
+
+
+Insert into MovieLanguage values(1, 1);
+Insert into MovieLanguage values(2, 1);
+Insert into MovieLanguage values(1, 2);
+Insert into MovieLanguage values(2, 2);
+Insert into MovieLanguage values(1, 3);
+Insert into MovieLanguage values(1, 5);
+Insert into MovieLanguage values(3, 5);
+
+
+
+
+
+Insert into Actor values(1, 'Daniel Radcliffe');
+Insert into Actor values(2, 'Rupert Grint');
+Insert into Actor values(3, 'Emma Watson');
+Insert into Actor values(4, 'Patrick Wilson');
+Insert into Actor values(5, 'Vera Farmiga Watson');
+Insert into Actor values(6, 'Ron Livingston');
+Insert into Actor values(7, 'Daisy Edgar-Jones');
+Insert into Actor values(8, 'Glen Powell');
+Insert into Actor values(9, 'Anthony Ramos');
+Insert into Actor values(10, 'Matthew McConaughey');
+Insert into Actor values(11, 'Anne Hathaway');
+Insert into Actor values(12, 'Jessica Chastain');
+Insert into Actor values(13, 'Saoirse Ronan');
+Insert into Actor values(14, 'Florence Pugh');
+
+
+
+Insert into MovieActor values(1, 1);
+Insert into MovieActor values(2, 1);
+Insert into MovieActor values(3, 1);
+Insert into MovieActor values(4, 2);
+Insert into MovieActor values(5, 2);
+Insert into MovieActor values(6, 2);
+Insert into MovieActor values(7, 3);
+Insert into MovieActor values(8, 3);
+Insert into MovieActor values(9, 3);
+Insert into MovieActor values(10, 4);
+Insert into MovieActor values(11, 4);
+Insert into MovieActor values(12, 4);
+Insert into MovieActor values(13, 5);
+Insert into MovieActor values(14, 5);
+Insert into MovieActor values(3, 5);
+
+
+
+
+Insert into Writer values(1, 'J.K. Rowling');
+Insert into Writer values(2, 'Steve Kloves');
+Insert into Writer values(3, 'Chad Hayes');
+Insert into Writer values(4, 'Carey W. Hayes');
+Insert into Writer values(5, 'Mark L. Smith');
+Insert into Writer values(6, 'Joseph Kosinski');
+Insert into Writer values(7, 'Michael Crichton');
+Insert into Writer values(8, 'Anne-Marie Martin');
+Insert into Writer values(9, 'Jonathan Nolan');
+Insert into Writer values(10, 'Christopher Nolan');
+Insert into Writer values(11, 'Greta Gerwig');
+Insert into Writer values(12, 'Louisa May Alcott');
+
+
+
+
+
+Insert into MovieWriter values(1, 1);
+Insert into MovieWriter values(2, 1);
+Insert into MovieWriter values(3, 2);
+Insert into MovieWriter values(4, 2);
+Insert into MovieWriter values(5, 3);
+Insert into MovieWriter values(6, 3);
+Insert into MovieWriter values(7, 3);
+Insert into MovieWriter values(8, 3);
+Insert into MovieWriter values(9, 4);
+Insert into MovieWriter values(10, 4);
+Insert into MovieWriter values(11, 5);
+Insert into MovieWriter values(12, 5);
+
